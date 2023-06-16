@@ -1,37 +1,54 @@
-import { useState } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from '../public/vite.svg';
-import './App.css';
+import HomePage from './pages/HomePage';
+import { Routes, Route } from 'react-router-dom';
+import ItemsListPage from './pages/ItemsListPage';
+import CallbackPage from './pages/CallbackPage';
+import ItemDetailPage from './pages/ItemDetailPage';
+import ProfilePage from './pages/ProfilePage';
+import NotFoundPage from './pages/NotFoundPage';
+import AdminPage from './pages/AdminPage';
+import { useAuth0 } from '@auth0/auth0-react';
+import PageLoader from './components/PageLoader';
+import GlobalStyles from './components/styled/GlobalStyles';
+import AppHeader from './components/header/AppHeader';
+import ItemsFavoritedPage from './pages/ItemsFavoritedPage';
+import AuthenticationGuard from './components/AuthenticationGuard';
 
 const App = (): JSX.Element => {
-  const [count, setCount] = useState(0);
+  const { isLoading } = useAuth0();
+
+  if (isLoading) {
+    return (
+      <div>
+        <PageLoader />
+      </div>
+    );
+  }
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank" rel="noreferrer">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank" rel="noreferrer">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button
-          onClick={() => {
-            setCount((count) => count + 1);
-          }}
-        >
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <GlobalStyles />
+      <AppHeader />
+      <main>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/callback" element={<CallbackPage />} />
+          <Route path="/items" element={<ItemsListPage />} />
+          <Route path="/items/:itemId" element={<ItemDetailPage />} />
+          <Route
+            path="/favorites"
+            element={<AuthenticationGuard component={ItemsFavoritedPage} />}
+          />
+          <Route
+            path="/profile"
+            element={<AuthenticationGuard component={ProfilePage} />}
+          />
+          <Route
+            path="/admin"
+            element={<AuthenticationGuard component={AdminPage} />}
+          />
+          <Route path="/*" element={<NotFoundPage />} />
+        </Routes>
+      </main>
     </>
   );
 };
